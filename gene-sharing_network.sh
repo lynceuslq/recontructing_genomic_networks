@@ -1,0 +1,46 @@
+#!/bin/bash
+
+export PATH="/hwfssz5/ST_INFECTION/GlobalDatabase/user/fengqikai/software/.conda/envs/Trinity-2.11.0/bin/:$PATH"
+export PATH="/hwfssz5/ST_INFECTION/GlobalDatabase/share/software/Miniconda3/envs.multi-user/vcontact2/bin/:$PATH"
+GPDdir="/ldfssz1/ST_INFECTION/P20Z10200N0206_pathogendb/liqian6/GPD/gut_phage_database"
+VCfile="vcset2"
+Outfir="/jdfssz1/ST_HEALTH/P20Z10200N0206/liqian6/genesharing/${VCfile// /}_vcontact2"
+VClist="/jdfssz1/ST_HEALTH/P20Z10200N0206/liqian6/genesharing/vclist.test"
+
+mkdir $Outfir
+mkdir $Outfir/tempdir
+
+while read vc; 
+do
+
+echo -e "start to files for $vc at $(date)"
+awk -v v="$vc" '$3 == v' $GPDdir/GPD_metadata.tsv > $Outfir/tempdir/$vc.metadata.tsv
+
+echo -e "start to extract proteomes for $vc at $(date)"
+cat $Outfir/tempdir/$vc.metadata.tsv | cut -f1 | while read con; do grep ">${con// /}_" -A1 $GPDdir/GPD_proteome.faa ; done > $Outfir/tempdir/$vc.proteome.faa
+
+grep  ">" $Outfir/tempdir/$vc.proteome.faa | sed -e 's/>//' | while read id ; do genome=$(echo -e "$id" | cut -d "_" -f1,2) ; ph=$(grep -w "$genome" $Outfir/tempdir/$vc.metadata.tsv | cut -f15) ; echo -e "$id,$genome|VC${vc}|$ph,VC${vc}"; done > $Outfir/tempdir/$vc.g2g.csv
+
+
+echo -e "prepared file for $vc at $(date)"
+
+done < $VClist
+
+echo -e "protein_id,contig_id,keywords" > $Outfir/tempdir/${VCfile// /}.g2g.csv
+cat $VClist | while read vc; do cat $Outfir/tempdir/$vc.g2g.csv >> $Outfir/tempdir/${VCfile// /}.g2g.csv ; done
+
+cat $VClist | while read vc; do cat $Outfir/tempdir/$vc.proteome.faa >> $Outfir/tempdir/${VCfile// /}.proteome.faa ; done
+
+echo -e "starting to contsruct network at $(date)"
+
+vcontact2 --raw-proteins $Outfir/tempdir/${VCfile// /}.proteome.faa   --rel-mode 'Diamond' --proteins-fp $Outfir/tempdir/${VCfile// /}.g2g.csv  --db 'ProkaryoticViralRefSeq94-Merged' --pcs-mode MCL --vcs-mode ClusterONE --c1-bin /hwfssz5/ST_INFECTION/GlobalDatabase/share/software/Miniconda3/envs.multi-user/vcontact2/bin/cluster_one-1.0.jar --output-dir  $Outfir  
+
+echo -e "finishing vCONTACT2 on $VCfile at $(date)"
+
+grep "vig_" $Outfir/c1.ntw > $Outfir/gpd.c1.ntw
+
+grep "vig_" $Outfir/c1.clusters > $Outfir/gpd.c1.clusters
+
+echo -e "$(cat $Outfir/gpd.c1.clusters | wc -l) gene-sharing clusters from input GPD genomes were found"
+
+echo -e "job completed on $VCfile at $(date)"
