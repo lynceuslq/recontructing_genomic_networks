@@ -1,11 +1,12 @@
 #!/bin/bash
 
-export PATH="/hwfssz5/ST_INFECTION/GlobalDatabase/user/fengqikai/software/.conda/envs/Trinity-2.11.0/bin/:$PATH"
-export PATH="/hwfssz5/ST_INFECTION/GlobalDatabase/share/software/Miniconda3/envs.multi-user/vcontact2/bin/:$PATH"
+export PATH="/PATH/TO/PYTHON/:$PATH"
+export PATH="/PATH/TO/vcontact2/bin/:$PATH"
+CLUSTERONE="/PATH/TO/cluster_one-1.0.jar"
 GPDdir="/ldfssz1/ST_INFECTION/P20Z10200N0206_pathogendb/liqian6/GPD/gut_phage_database"
-VCfile="vcset2"
-Outfir="/jdfssz1/ST_HEALTH/P20Z10200N0206/liqian6/genesharing/${VCfile// /}_vcontact2"
-VClist="/jdfssz1/ST_HEALTH/P20Z10200N0206/liqian6/genesharing/vclist.test"
+VCfile="vcset2"#give a name to your output directory
+Outfir="/PATH/TO/OUTPUT/${VCfile// /}_vcontact2"
+VClist="/PATH/TO/vclist.txt"#a list of viral clusters from GPD to infer gene-sharing networks, should all in intergers and separated by newline elements
 
 mkdir $Outfir
 mkdir $Outfir/tempdir
@@ -33,7 +34,7 @@ cat $VClist | while read vc; do cat $Outfir/tempdir/$vc.proteome.faa >> $Outfir/
 
 echo -e "starting to contsruct network at $(date)"
 
-vcontact2 --raw-proteins $Outfir/tempdir/${VCfile// /}.proteome.faa   --rel-mode 'Diamond' --proteins-fp $Outfir/tempdir/${VCfile// /}.g2g.csv  --db 'ProkaryoticViralRefSeq94-Merged' --pcs-mode MCL --vcs-mode ClusterONE --c1-bin /hwfssz5/ST_INFECTION/GlobalDatabase/share/software/Miniconda3/envs.multi-user/vcontact2/bin/cluster_one-1.0.jar --output-dir  $Outfir  
+vcontact2 --raw-proteins $Outfir/tempdir/${VCfile// /}.proteome.faa   --rel-mode 'Diamond' --proteins-fp $Outfir/tempdir/${VCfile// /}.g2g.csv  --db 'ProkaryoticViralRefSeq94-Merged' --pcs-mode MCL --vcs-mode ClusterONE --c1-bin $CLUSTERONE --output-dir  $Outfir  
 
 echo -e "finishing vCONTACT2 on $VCfile at $(date)"
 
