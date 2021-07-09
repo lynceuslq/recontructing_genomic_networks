@@ -1,16 +1,19 @@
 #!/bin/bash
 
-export PATH=/hwfssz5/ST_INFECTION/GlobalDatabase/user/liqian6/tools/ncbi-blast-2.10.1+/bin:$PATH
+#######################################################please define the arguements below######################################################
+export PATH="/PATH/TO/ncbi-blast-2.10.1+/bin:$PATH"
 
-MCXLOAD="/hwfssz5/ST_INFECTION/GlobalDatabase/share/software/Miniconda3/envs.multi-user/vcontact2/bin/mcxload"
-MCL="/hwfssz5/ST_INFECTION/GlobalDatabase/share/software/Miniconda3/envs.multi-user/vcontact2/bin/mcl"
-MCXDUMP="/hwfssz5/ST_INFECTION/GlobalDatabase/share/software/Miniconda3/envs.multi-user/vcontact2/bin/mcxdump"
+MCXLOAD="/PATH/TO/mcxload"
+MCL="/PATH/TO/mcl"
+MCXDUMP="/PATH/TO/mcxdump"
 
 
-workingdir="/jdfssz1/ST_HEALTH/P20Z10200N0206/liqian6/test_rec_GPD/testmorehosts" #should be the same place running the script
-INPUTdir="/ldfssz1/ST_INFECTION/P20Z10200N0206_pathogendb/liqian6/GPD/search_by_host"
-hostlist="/ldfssz1/ST_INFECTION/P20Z10200N0206_pathogendb/liqian6/GPD/MCL_test/hostlist.txt"
+workingdir="/PATH/TO/WORKING/DIRECTORY/" #should be the same place running the script
+INPUTdir="/PATH/TO/GPD/search_by_host" #a directory storing metadata.tsv and phage genomes (phage_sequences.fa) and separated by host species
+hostlist="/PATH/TO/hostlist.txt" #a list of host species, should be no space in the names, separated by newline elements
 
+
+#####################################################you do not need to change anything below###################################################
 echo -e "start to prepare fasta files at $(date)"
 while read host;
 do 
@@ -61,4 +64,9 @@ mkdir $workingdir/cl
 cat $workingdir/clusters.mci.I14 while read line; do echo -e "$line" | tr "\t" "\n" | tr "|" "\t" > $workingdir/tmp ; cut -f1 $workingdir/tmp | sort | uniq | while read contig; do echo -e "$contig|$(awk -v c="$contig" '$1 == c' $workingdir/tmp | cut -f2 | tr "\n" ";")" ; done > $workingdir/cl/cluster_$n.txt ; n=$((n+1))  ; done
 
 rm $workingdir/tmp
+
+cut -f1,2,5 $workingdir/tmpin.outfmt6 | tr "|" "\t" | cut -f1,3,5 | sort -u > $workingdir/tmpin.blastn.length.abc
+
+cut -f1,2 $workingdir/tmpin.blastn.length.abc | sort -u | while read c1 c2 ; do awk -v a="$c1" -v b="$c2" '$1 == a && $2 ==b' $workingdir/tmpin.blastn.length.abc | sort -k3,3 -n -r | head -1 ; done > $workingdir/tmpin.blastn.length.sorted.top.abc
+
 echo -e "job completed at $(date)"
