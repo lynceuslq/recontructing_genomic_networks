@@ -1,5 +1,6 @@
 #!/bin/bash
 
+###################################################please define the arguements below######################################################
 export PATH="/PATH/TO/PYTHON/:$PATH"
 export PATH="/PATH/TO/vcontact2/bin/:$PATH"
 CLUSTERONE="/PATH/TO/cluster_one-1.0.jar"
@@ -8,6 +9,8 @@ VCfile="vcset2"#give a name to your output directory
 Outfir="/PATH/TO/OUTPUT/${VCfile// /}_vcontact2"
 VClist="/PATH/TO/vclist.txt"#a list of viral clusters from GPD to infer gene-sharing networks, should all in intergers and separated by newline elements
 
+
+##################################################you do not need to change anything below##################################################
 mkdir $Outfir
 mkdir $Outfir/tempdir
 
