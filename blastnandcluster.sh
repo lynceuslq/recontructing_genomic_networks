@@ -43,6 +43,7 @@ awk '$1 != $2' $workingdir/tmp.out | awk '$5 >= 500' > $OUTPUTtab
 
 cut -f 1,2,7 $OUTPUTtab | sort | uniq > $OUTPUTabc
 
+#############################################################making genome clusters##############################################################
 echo -e "start to load abc file at $(date)"
 
 $MCXLOAD  -abc $workingdir/tmpin.abc --stream-mirror  --stream-neg-log10 -stream-tf 'ceil(200)' -write-tab $workingdir/tmpin.tab -o $workingdir/tmpin.mci
@@ -56,6 +57,9 @@ echo -e "start to make tabular results at $(date)"
 $MCXDUMP -icl $workingdir/out.tmpin.mci.I14 -tabr  $workingdir/tmpin.tab -o  $workingdir/clusters.mci.I14
 
 echo -e "MCL completed at $(date)"
+
+
+######################################################sorting and remaking genome clusters######################################################
 
 echo -e "start to extract clusters at $(date)"
 
