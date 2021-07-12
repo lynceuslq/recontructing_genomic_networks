@@ -52,6 +52,6 @@ mkdir $Outfir/cl
 
 cut -d "," -f8 $Outfir/gpd.c1.clusters | sed 's/"//g' | while read line; do n=$((n+1)) ; echo -e "cluster${n// /}" >> $Outfir/cl/cl.list ; echo -e "$line" | tr " " "\n" > $Outfir/cl/cluster${n// /}.list ; done
 
-cat $VClist | while read vc ; do cat $Outfir/cl/cl.list | while read cl ; do m=$(grep "VC" $cl.list | wc -l) ; n=$(grep -w "VC${vc}" $Outfir/cl/$cl.list| wc -l) ; echo -e "VC$vc" > $Outfir/cl/VC.$vc.tmp; echo -e "\t$n/$m" >> $Outfir/cl/VC.$vc.tmp; done ; done
+cat $VClist | while read vc ; do echo -e "VC$vc" > VC.$vc.tmp; cat $Outfir/cl/cl.list | while read cl ; do m=$(grep "VC" $cl.list | wc -l) ; n=$(grep -w "VC${vc}" $Outfir/cl/$cl.list| wc -l); echo -e "\t$n/$m" >> $Outfir/cl/VC.$vc.tmp; done ; done
 
 echo -e "job completed on $VCfile at $(date)"
