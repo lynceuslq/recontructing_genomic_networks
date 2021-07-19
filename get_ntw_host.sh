@@ -5,7 +5,7 @@
 BLASTN_tab="/PATH/TO/blastn.length.sorted.top.abc"
 #can be found in the outputs of blastnandcluster.v2.sh 
 
-PHAGEANDHOST="/PATH/TO/genomewithhost.list"
+GENOMELIST="/PATH/TO/genomewithhost.list"
 #a file of phage genomes and their host species seperated by "|", if there are multiple hosts for the same phage, hosts should be separated by ";"
 #example ivig_1019|Clostridium_M_bolteae;Dorea_longicatena;
 
