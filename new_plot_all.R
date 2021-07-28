@@ -77,12 +77,14 @@ server <- function(input, output,session) {
     
     plotme <- data.frame(prop_shared_genes=m, prop_genomes=p)
     
-    bars <- ggplot(data=plotme, aes(x=prop_genomes, y=prop_shared_genes)) + geom_bar(stat="identity", fill="steelblue")
+    bars <- ggplot(data=plotme, aes(x=prop_genomes, y=prop_shared_genes)) + 
+        geom_bar(stat="identity", fill="steelblue")
     
     
     plotme2 <- subset(pairs, pairs$VC == t)
     
-    dots <- ggplot2.scatterplot(data=plotme2, x="prop_VC", y="prop_PC", color = "blue")  + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+    dots <- ggplot2.scatterplot(data=plotme2, x="prop_VC", y="prop_PC", color = "blue")  + 
+         theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
     
     x <- sep.l <- plotme2$prop_VC
     y <- pet.l <- plotme2$prop_PC
