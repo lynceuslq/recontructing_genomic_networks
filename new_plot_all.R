@@ -1,3 +1,5 @@
+#!/bin/Rscript
+
 library(shiny)
 library(ggplot2)
 library(easyGgplot2)
