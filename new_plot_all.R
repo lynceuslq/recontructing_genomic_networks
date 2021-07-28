@@ -6,7 +6,11 @@ library(plot3D)
 library(RColorBrewer)
 library(shinyjs)
 
-load('vcpc.new.RData')
+#load('vcpc.new.RData')
+
+pairs <- read.table("matchpctovconvc.pairs.prop.txt", header = TRUE)
+
+pairs$jaccard <- pairs$prot_num_VC / (pairs$prot_num_PC + pairs$gm_num_VC - pairs$prot_num_VC)
 
 ui <- fluidPage(
   titlePanel("Ploting proportions of shared genes against genome clusters"),
