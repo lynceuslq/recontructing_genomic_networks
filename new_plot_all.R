@@ -4,15 +4,10 @@ library(shiny)
 library(ggplot2)
 library(easyGgplot2)
 library(ggpubr)
-library(plot3D)
 library(RColorBrewer)
 library(shinyjs)
 
-#load('vcpc.new.RData')
-
-pairs <- read.table("matchpctovconvc.pairs.prop.txt", header = TRUE)
-
-pairs$jaccard <- pairs$prot_num_VC / (pairs$prot_num_PC + pairs$gm_num_VC - pairs$prot_num_VC)
+load('vcpc.new.RData')
 
 ui <- fluidPage(
   titlePanel("Ploting proportions of shared genes against genome clusters"),
@@ -35,6 +30,9 @@ ui <- fluidPage(
       
       numericInput("inter", "interval_of_Jaccard_index_(%)", 
                    value = 5, min = 1, max = 10),
+      
+      numericInput("ylmt", "Up_limit_of_PC_counts", 
+                   value = 50, min = 1, max = 200),
 
 
       
@@ -67,6 +65,7 @@ server <- function(input, output,session) {
     u <- as.numeric(input$upj)
     d <- as.numeric(input$downj)
     v <- as.numeric(input$inter)
+    yl <- as.numeric(input$ylmt)
     
     p <- seq(100-w) / 100 + w/100
     
@@ -79,23 +78,17 @@ server <- function(input, output,session) {
     
     plotme <- data.frame(prop_shared_genes=m, prop_genomes=p)
     
-    bars <- ggplot(data=plotme, aes(x=prop_genomes, y=prop_shared_genes)) + 
-        geom_bar(stat="identity", fill="steelblue")
+    bars <- ggplot(data=plotme, aes(x=prop_genomes, y=prop_shared_genes)) + geom_bar(stat="identity", fill="steelblue")
     
     
     plotme2 <- subset(pairs, pairs$VC == t)
     
-    dots <- ggplot2.scatterplot(data=plotme2, x="prop_VC", y="prop_PC", color = "blue")  + 
-         theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+    dots <- ggplot2.scatterplot(data=plotme2, x="prop_VC", y="prop_PC", color = "blue")  + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
     
-    x <- sep.l <- plotme2$prop_VC
-    y <- pet.l <- plotme2$prop_PC
-    z <- sep.w <- plotme2$jaccard
-    
-    jdist <- as.ggplot(~scatter3D(x,y,z, bty = "g", theta = 20, phi = 0, xlab = "prop_VC",
-                                  ylab ="prop_PC", zlab = "jaccard_index"
-                                  ))
-    
+    jdist <- ggplot2.scatterplot(data=plotme2, x="prop_VC", y="jaccard", color = "green")  + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+      
+      
     countpcs <- data.frame()
     
     prop <- seq(d,u,v) / 100
@@ -116,12 +109,12 @@ server <- function(input, output,session) {
       
     }
     
-    box <- ggplot(countpcs, aes(x=jaccard, y=sig_PC, fill = jaccard )) + 
+    box <- ggplot(countpcs, aes(x=jaccard, y=sig_PC, fill = jaccard), ylim=c(0,50)) + 
       geom_boxplot(alpha = 0.75) + 
       geom_jitter() + 
       scale_fill_brewer(palette = "Set3") +
       scale_y_continuous(name = "Number of PC per VC pass the threshold", 
-                         limits=c(0, 200)) +
+                         limits=c(0, yl)) +
       scale_x_discrete(name = "Threshold for Jaccard index")
     
     
