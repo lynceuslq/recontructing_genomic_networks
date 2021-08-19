@@ -1,4 +1,4 @@
-!#/bin/Rscript
+#!/bin/Rscript
 
 library(shiny)
 library(ggplot2)
