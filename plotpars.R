@@ -1,9 +1,12 @@
+#!/bin/Rscript
+
 library(shiny)
 library(ggplot2)
 library(patchwork)
 library(easyGgplot2)
 library(shinyjs)
 
+load("comparingdiamondstats.RData")
 
 ui <- fluidPage(
   titlePanel("Plotting conservation status of protein clusters"),
