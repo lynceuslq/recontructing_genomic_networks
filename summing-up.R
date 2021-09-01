@@ -88,13 +88,16 @@ for(m in 1:length(cllist)) {
   datat <- subset(testhm94, testhm94$cluster == testhmcom94$cluster[m])$abundance 
   if(sum(datat) == 0) {
     testhmcom94$nll_abd_hm[m] <- 0
+    testhmcom94$nll_sd_abd_hm[m] <- 0
   }
   else if(length(datat) == 1 ) {
     testhmcom94$nll_abd_hm[m] <- datat
+    testhmcom94$nll_sd_abd_hm[m] <- NA
   }
   else {
   mle = optim(par = c(mu = 10, sigma = 1), fn = NLL, data = datat)
   testhmcom94$nll_abd_hm[m] <- as.numeric(mle$par[1])
+  testhmcom94$nll_sd_abd_hm[m] <- as.numeric(mle$par[2])
   }
 
   #testhmcom94$sum_abd_gm[m] <- sum(subset(test94, test94$cluster == testhmcom94$cluster[m])$abundance) 
@@ -108,6 +111,7 @@ testhmcom94$sum_abd_hm_adj[is.na(testhmcom94$sum_abd_hm_adj)] <- 0
 testhmcom94$adj_ref_sum <- testhmcom94$ref_sum / sum(testhmcom94$ref_sum)
 testhmcom94$prop_sum_abd_hm_adj <- testhmcom94$sum_abd_hm_adj / sum(testhmcom94$sum_abd_hm_adj)
 testhmcom94$prop_nll_abd_hm <- testhmcom94$nll_abd_hm / sum(testhmcom94$nll_abd_hm)
+testhmcom94$prop_nll_sd_abd_hm <- testhmcom94$nll_sd_abd_hm / sum(testhmcom94$nll_abd_hm)
 testhmcom94$log_prop_sum_abd_hm_adj <- -log10(testhmcom94$sum_abd_hm_adj / sum(testhmcom94$sum_abd_hm_adj))
 
 write.table(testhmcom94, file=paste(outdir, paste(metaset,kvalue,"txt", sep="."), sep="/"), sep="\t", quote=FALSE)
