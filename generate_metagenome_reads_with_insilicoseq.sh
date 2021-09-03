@@ -11,11 +11,12 @@ hostmetadata="/PATH/TO/bacterialhost.concise.tsv"
 helpFunction()
 {
    echo ""
-   echo "Usage: $0 -d workingdir -s metagenome_names -n number_of_metagenomes -h to_add_bacterial_hosts_or_not -m model_of_simulation -a number_of_reads"
+   echo "Usage: $0 -d workingdir -s metagenome_names -n number_of_metagenomes -g number_of_phages -h to_add_bacterial_hosts_or_not -m model_of_simulation -a number_of_reads"
    echo "header of tabular outputs: qacc sacc qlen slen pident evalue bitscore mismatch staxids sscinames scomnames sblastnames sskingdoms"
    echo -e "\t-d drectory to outputs"
    echo -e "\t-s give a name to your metagenome sets"
    echo -e "\t-n number of metagenomes to simulate"
+   echo -e "\t-g number of phages to simulate"
    echo -e "\t-h true if include genomes of bacterial hosts, false to exclude them"
    echo -e "\t-m model of insilicoseq simulations, eg. novaseq, miseq, hiseq"
    echo -e "\t-a Number of reads to generate, eg. 1000000. Allows suffixes k, K, m, M, g and G (ex 0.5M for 500000)"
@@ -28,6 +29,7 @@ do
       d ) workingdir="$OPTARG" ;;
       s ) metagenome_names="$OPTARG" ;;
       n ) number_of_metagenomes="$OPTARG" ;;
+      g ) number_of_phages="$OPTARG" ;;
       h ) to_add_bacterial_hosts_or_not="$OPTARG" ;;
       m ) model_of_simulation="$OPTARG" ;;
       a ) number_of_reads="$OPTARG" ;;
@@ -36,7 +38,7 @@ do
 done
 
 
-if [ -z "$workingdir" ] || [ -z "$metagenome_names" ] || [ -z "$number_of_metagenomes" ] || [ -z "$to_add_bacterial_hosts_or_not" ] || [ -z "$number_of_reads" ] || [ -z "$model_of_simulation" ]
+if [ -z "$workingdir" ] || [ -z "$metagenome_names" ] || [ -z "$number_of_metagenomes" ] || [ -z "$to_add_bacterial_hosts_or_not" ] || [ -z "$number_of_reads" ] || [ -z "$model_of_simulation" ]  || [ -z "$number_of_phages" ]
 then
    echo "Some or all of the parameters are empty";
    helpFunction
@@ -46,7 +48,7 @@ seq 1 1 $number_of_metagenomes | awk -v s="$metagenome_names" '{OFS="_"; {print 
 do
 out_acc=$setacc
 
-cut -f1,3,15 $gpdmetadata | tr "\t" "|" | tail -n +2 | shuf | head -500 > $workingdir/$out_acc.ph.list
+cut -f1,3,15 $gpdmetadata | tr "\t" "|" | tail -n +2 | shuf | head -n $number_of_phages > $workingdir/$out_acc.ph.list
 
 phgmlist=$workingdir/$out_acc.ph.list
 echo -e "start to extract phage genome set $out_acc at $(date)"
