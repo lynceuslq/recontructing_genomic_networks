@@ -1,5 +1,3 @@
-#!/bin/Rscript
-
 library(shiny)
 library(ggplot2)
 library(patchwork)
@@ -8,7 +6,7 @@ library(ggpmisc)
 library(easyGgplot2)
 library(shinyjs)
 
-load("new.comparingdiamondstats.RData")
+#load("new.comparingdiamondstats.RData")
 
 ui <- fluidPage(
   titlePanel("Plotting results from viral cluster profiling"),
@@ -21,7 +19,7 @@ ui <- fluidPage(
                   choices =  list("proportions of true abundance of test datasets" = 1,
                                   "diamond parameter selection" = 2,
                                   "profiling results and comparisons" = 3),
-                  selected = 1
+                  selected = 2
       ),
       
       selectInput("pars", 
@@ -47,16 +45,16 @@ ui <- fluidPage(
                   selected = 1
       ),
       sliderInput("yl", "up limit of y axis:", 
-                   value = 0.1, min = 0, max = 1),
+                   value = 0.05, min = 0, max = 1),
       checkboxGroupInput("selectk", 
-                         h4("please select k(max hits) from:"), 
-                         choices = unique(comstats$kvalue),
-                         selected = unique(comstats$kvalue)[1:4]
+                         h4("please select models from:"), 
+                         choices = unique(prof$kvalue),
+                         selected = unique(prof$kvalue)[1]
       ),
       checkboxGroupInput("setacc", 
                          h4("please select test datasets from:"), 
-                         choices = unique(comstats$testset),
-                         selected = unique(prof$testset)[seq(1,70,15)]
+                         choices = unique(prof$testset),
+                         selected = unique(prof$testset)[seq(1,45,15)]
       )
     ),
     
@@ -248,11 +246,15 @@ server <- function(input, output,session) {
       prof1 <- subset(prof, prof$kvalue == input$selectk)
       print(length(prof1$prop_nll_abd_hm))
       plotme <- subset(genomic, genomic$testset ==  setlist[i])
+      if(length(plotme$cluster) > 0) {
       plotty <- data.frame(cluster=plotme$cluster, 
                            adj_ref_sum=plotme$adj_ref_sum, 
                            values=plotme$prop_sum_abd_gm, 
                            maxhits=c("genomic"), 
                            predictor=c("genomes"))
+      }else{
+        plotty <- data.frame()
+      }
       plotme <- subset(prof1, prof1$testset == setlist[i])
       
       if(input$est ==1) {
@@ -291,7 +293,7 @@ server <- function(input, output,session) {
                         method.args = list(formula = formula),
                         geom = 'text',
                         aes(label = paste("P = ", signif(..p.value.., digits = 4), sep = "")),
-                        label.x = 'right', label.y = 0.04, size = 3) +
+                        label.x = 'right', label.y = 0.025, size = 3) +
         ylim(0, input$yl) +
         xlim(0, 0.05) +
         ggtitle(setlist[i])
@@ -311,7 +313,7 @@ server <- function(input, output,session) {
     
     pp
     
-  }, height = 800, width = 1200)
+  }, height = 1200, width = 1200)
   
   
   observeEvent(input$refresh, {
