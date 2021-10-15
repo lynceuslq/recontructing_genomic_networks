@@ -4,9 +4,10 @@ args = commandArgs(trailingOnly=TRUE)
 
 if (length(args)==0) {
   stop("Arguments must be supplied", call.=FALSE)
-} else if (length(args)==1) {
+} else if (length(args)>=1) {
   # default output file
 
+print(args)
 setlist <- read.table(args[1])$V1
 kvalue <- c(args[2])
 phagelist <- c(args[3])
