@@ -7,7 +7,7 @@ An example of the gene-sharing network of 21 viral clusters from GPD, visualized
 
 
 
-Literature outlines
+# Literature outlines
 
 Outlines: the identification of core proteins for genus-level clusters of phages and a workflow of abundance estimation of viruses with core proteins
 
@@ -77,3 +77,50 @@ For most cases, 3 replications were generated
 Parameters to compare (Pearson’s regression with true phage abundance) 
 Abundance estimation with phage genomes
 Reduction in computational time
+
+
+Results
+
+1. Overview of VCs and core-PCs identified by the pipelines, and their relation to the original literature
+Total amount of genomes in GPD140000 -> 85471 genomes in clusters with >= 3 genomes
+85471 input -> 68251 phages clustered with vcontact2 (3533 VCs)
+62149 phages from 2918 viral clusters (42472 PCs from primary selection with Jaccard index >= 0.7)
+43571 phages (2319 VC) and 19241 PCs were selected based on primary selection standards
+7321 PCs were added by secondary selection standards
+Removing inter-homo PCs (886: protein-pairwise homology, 1904: protein-genome homology)
+2825 VCs (56509 genomes) 
+
+2. Choosing suitable parameters for abundant estimation with marker proteins
+Comparing the outcomes of TP and FP alignments in diamond blast table
+Selecting different sets of alignment identity and e-value thresholds and comparing rates of TP and PF after filtering
+Decision: two sets of parameters: “more sensitive” and “more specific”
+ 
+3. Assessing the accuracy of phage abundance estimated by marker proteins 
+For phage-only meta genomes (across all abundance models and diversity levels_, the accuracy (resembled by Pearson’s regression) of estimates by marker proteins is comparable to the accuracy of genome estimates (coefficient ~ 60 to 80%)
+For meta genomes integrated with bacterial hosts, the accuracy of marker protein estimates is independent of bacterial compositions, whereas the accuracy of genome estimates drops in the presence of hosts
+The accuracy of genome estimates significantly goes down with the fraction of host genomes in metagenomes, the accuracy of protein estimates exceeds genome estimates when total host abundance is more than 65%. 
+
+4. Assessing the enhancement in computational performance by estimating abundance with marker proteins
+Comparing computational time between aligning reads to marker proteins and genomes (differing reads counts)
+
+
+Discussion
+1. A conclusion 
+
+2. Limitations in the method 
+Limited knowledge in the classification metagenome-assembled phages and generate more sensible viral clusters
+Unable to assign more phages to genome clusters due to limitations in computing capacity -> need better tools to perform de novo clustering on viral genomes
+The lack of representative proteins when using other de novo genome cluster methods (GPD genome clusters), which requires less computational resources but worse clustering results. 
+
+3. Uncertainties in quantifying the composition of microbiota 
+Metagenome-assembled phages: incompleteness in genomes, mistakenly assembled, host assignments, etc
+Completeness in database: a definite diversity of gut phages, or more will be observed if we sample more? 
+
+4. Future perspectives
+Integrated phage databases
+Improvements in clustering methods to allow assigning phages with higher divergence to genome clusters ( clustering rates) 
+Improvements in the standards of quantifying phage evolution (whole-genome diversity or gene-sharing networks)
+
+
+Reference
+
