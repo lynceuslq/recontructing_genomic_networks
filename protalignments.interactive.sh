@@ -38,7 +38,7 @@ do
 done
 
 
-kvalue="sensitive"
+#kvalue="sensitive"
 OUTDIR="$OUTDIR1/$kvalue"
 
 if [ -z "$READ1" ] || [ -z "$kvalue" ] || [ -z "$OUTDIR1" ] || [ -z "$ACCESSION" ] || [ -z "$THREADS ] 
