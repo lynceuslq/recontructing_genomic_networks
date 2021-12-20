@@ -57,7 +57,7 @@ OUTPATH="$OUTDIR/$ACCESSION"
 if [ -z "$READ2" ]
 then
 
-cp $READ1 $OUTPATH/${ACCESSION// /}.tmp.fq
+zcat $READ1 > $OUTPATH/${ACCESSION// /}.tmp.fq
 
 else
 
