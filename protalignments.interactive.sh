@@ -8,7 +8,7 @@ BEDTOOLS="/PATH/TO/bedtools2/bin/bedtools"
 PROTLIST="//PATH/TO/cl2_recoverprots.clustered.len.overlappingremoved.length.txt"
 phlist="/PATH/TO/gpdvcmorethan3.clustered.len.overlappingremoved.phage.list"
 RSCRIPT="/PATH/TO/Rscript"
-SUMUPR="/PATH/TO/sumup.argparse.R"
+SUMUPR="/PATH/TO/sumup.protalign.R"
 
 #####################################################you do not need to change anything below###################################################
 helpFunction()
