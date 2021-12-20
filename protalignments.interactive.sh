@@ -24,7 +24,7 @@ helpFunction()
    exit 1 # Exit script after printing help
 }
 
-while getopts "i:c:t:" opt
+while getopts "1:2:p:o:s:t:" opt
 do
    case "$opt" in
       1 ) READ1="$OPTARG" ;;
