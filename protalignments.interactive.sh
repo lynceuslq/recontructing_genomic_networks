@@ -41,7 +41,7 @@ done
 #kvalue="sensitive"
 OUTDIR="$OUTDIR1/$kvalue"
 
-if [ -z "$READ1" ] || [ -z "$kvalue" ] || [ -z "$OUTDIR1" ] || [ -z "$ACCESSION" ] || [ -z "$THREADS ] 
+if [ -z "$READ1" ] || [ -z "$kvalue" ] || [ -z "$OUTDIR1" ] || [ -z "$ACCESSION" ] || [ -z "$THREADS" ] 
 then
    echo "Some or all of the parameters are empty";
    helpFunction
