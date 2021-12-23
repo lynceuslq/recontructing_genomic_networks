@@ -14,11 +14,9 @@ if (length(args)==0) {
   
   #linking phage genome accessions to their clusters
   phage <- read.table(file=phagelist, sep="|")
-  for(i in 1:length(phage$V1)){
-    phage$cl[i] <-  unlist(strsplit(as.character(phage$V4[i]), ":"))[1]
-    phage$num_gm[i] <- unlist(strsplit(as.character(phage$V4[i]), ":"))[2]
-  }
-  
+  colnames(phage)[4] <- c("cl")
+  colnames(phage)[5] <- c("num_gm")
+ 
   #defining the function for maximum likelihood parameter optimization
   NLL <- function(pars, data) {
     # Extract parameters from the vector
