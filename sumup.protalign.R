@@ -110,7 +110,7 @@ if (length(args)==0) {
     testhmcom94$sum_abd_hm_adj[is.na(testhmcom94$sum_abd_hm_adj)] <- 0
     
     testhmcom94$prop_nll_abd_hm <- testhmcom94$nll_abd_hm / sum(testhmcom94$nll_abd_hm)
-    testhmcom94$prop_nll_sd_abd_hm <- testhmcom94$nll_sd_abd_hm / sum(tes thmcom94$nll_abd_hm)
+    testhmcom94$prop_nll_sd_abd_hm <- testhmcom94$nll_sd_abd_hm / sum(testhmcom94$nll_abd_hm)
     testhmcom94$prop_sum_abd_hm_adj <- testhmcom94$sum_abd_hm_adj / sum(testhmcom94$sum_abd_hm_adj)
     testhmcom94$log_prop_sum_abd_hm_adj <- -log10(testhmcom94$sum_abd_hm_adj / sum(testhmcom94$sum_abd_hm_adj))
     
