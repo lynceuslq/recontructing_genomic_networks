@@ -7,6 +7,8 @@ VCfile="vcset_test"
 Outfir="/jdfssz1/ST_HEALTH/P20Z10200N0206/liqian6/genesharing/${VCfile// /}_vcontact2"
 VClist="/jdfssz1/ST_HEALTH/P20Z10200N0206/liqian6/genesharing/vclist_test.txt"
 MAX_OVERLAP="0.2"
+DIAMOND="/ldfssz1/ST_META/share/User/zhujie/.conda/envs/bioenv/bin/diamond"
+
 
 mkdir $Outfir
 mkdir $Outfir/tempdir
@@ -189,7 +191,74 @@ cat $outdir/tmplist2 $outdir/tmplist1  | sort | uniq -d > $outdir/selected_vcpc.
 #loading and reformatting selected sequences
 cat $outdir/selected_vcpc.list | while read vc pc ; do echo -e "$(cat $outdir/$vc/$pc.$vc.clustered.faa   | tr "\n" "\t")" |   tr ">" "\n" | sed '/^[[:space:]]*$/d' | while read c1 c2; do a=$(echo -e "$c2" | wc -c) ; b=$(($a-1)) ; echo -e ">$c1|${b}aa\n$c2" ; done ; done >  $outdir/selected_pc.len.clstr.faa 
 
-cat $outdir/selected_vcpc.list  | cut -f1 | sort | uniq | while read vc ; do cat $outdir/phage.list | grep -w "$vc" | grep "vig_" >> $outdir/selected_pc.phage.list ; echo -e "done with $vc" ; done
+cat $outdir/selected_vcpc.list  | cut -f1 | sort | uniq | while read vc ; do cat $outpath/phage.list | grep -w "$vc" | grep "vig_" >> $outdir/selected_pc.phage.list ; echo -e "done with $vc" ; done
+
+
+
+preselection="$outdir/preselectionprots.2.list"
+
+#setting the minimum amount of PCs for a VC
+cat $outdir/selected_vcpc.list | cut -f1 | uniq -c | awk '$1 > 8' | rev | cut -d " " -f1 | rev > $outdir/selected.r1.list
+
+grep -v -w -f $outdir/selected.r1.list $outpath/pcvclist.info | awk '{OFS="\t"; {print $4, $1}}' > $outdir/tmplist1
+
+cat $outdir/selected_vcpc.list | cut -f2 > $outdir/tmplist2
+
+grep -v -w -f $outdir/tmplist2 $outdir/tmplist1 > $preselection
+
+
+
+export PATH="/jdfssz1/ST_HEALTH/P20Z10200N0206/liqian6/miniconda/bin:$PATH"
+
+indir=$outdir
+workingdir=$outdir
+outdir="$indir/preselection"
+
+tail -n +2 $outpath/pcvclist.info | cut -f4 | sort | uniq > $workingdir/allcl2sig.list 
+
+mkdir $outdir
+echo -e "job started on $(date)"
+
+cat $preselection | cut -f1,2 | while read vc pc
+do
+
+cp $indir/$vc/$pc.$vc.aligned.faa $outdir/$pc.$vc.aligned.faa
+
+Gblocks $outdir/$pc.$vc.aligned.faa  -t=p -e=-gb1 -b4=20
+
+$cdhitprot -i $outdir/$pc.$vc.aligned.faa-gb1  -o $outdir/$pc.$vc.aligned.faa-gb1.clustered.faa -c 0.8 -aS 0.7 -p 1
+
+echo -e "completed with $vc $pc"
+
+done
+
+echo -e "job completed at $(date)"
+
+grep -c ">" $outdir/*.aligned.faa-gb1.clustered.faa | tr ":" "\t" | awk '$2 > 0 && $2 <= 3' | cut -f1 | while read file ; do cat $file ; done > $workingdir/rtwoselected.clustered.faa
+
+cat $workingdir/rtwoselected.clustered.faa  | tr "\n" "\t" | tr ">" "\n" | sed '/^[[:space:]]*$/d' | while read line; do echo -e ">$(echo -e "$line" | cut -f1)\n$(echo -e "$line" | cut -f2- | sed -e "s/\t//g")" ; done > $workingdir/moreselected.clustered.faa
+
+
+echo -e ">" >> $workingdir/moreselected.clustered.faa
+cat $workingdir/moreselected.clustered.faa  | tr "\n" "\t" | tr ">" "\n" | sed '/^[[:space:]]*$/d' | while read acc seq ; do newacc=$(echo -e "$acc" | cut -d "|" -f1,2,3,4) ; a=$(echo -e "$seq" | wc -c) ; b=$((a-1)) ;  echo -e ">$newacc|${b}aa\n$seq" ; done  > $workingdir/moreselected.clustered.len.faa
+
+grep ">"  $workingdir/moreselected.clustered.len.faa | tr "|" "\t" | awk '$5 >= 15' | cut -f3,4 |  sort | uniq > $workingdir/newtoadd.pcvc.list
+
+
+cat $workingdir/newtoadd.pcvc.list |  while read pc vc ; do cat $outdir/$pc.$vc.aligned.faa-gb1.clustered.faa ; done > $workingdir/newtoadd.filtered.clustered.faa
+
+
+cat $workingdir/newtoadd.filtered.clustered.faa | tr "\n" "\t" | tr ">" "\n" | sed '/^[[:space:]]*$/d' | while read line; do echo -e ">$(echo -e "$line" | cut -f1)\n$(echo -e "$line" | cut -f2- | sed -e "s/\t//g")" ; done | sed -e "s/ //g" > $workingdir/newtoadd.filtered.clustered.formatted.faa
+
+cat $workingdir/selected_pc.len.clstr.faa $workingdir/newtoadd.filtered.clustered.formatted.faa > $Outfir/total.selected_pc.len.clstr.faa
+
+$DIAMOND makedb -d $Outfir/total.selected_pc.len.clstr --in $Outfir/total.selected_pc.len.clstr.faa
+
+$DIAMOND blastx -d $Outfir/total.selected_pc.len.clstr -q $GPDdir/GPD_sequences.fa -f 6 -o $Outfir/pairwiseblast.tab --threads 2
+
+awk -F "\t" '$3 >= 75 && $4 >= 15 ' pairwiseblast.tab | cut -f1,2 | tr "|" "\t" | cut -f1,4,5 | sort | uniq | while read gm pc cl ; do echo -e "$gm\t$(grep -w "$gm" $outpath/phage.list)\t$pc\t$cl" ; done | awk -F "\t" '$2 != ""' | tr ":" "|" | tr "|" "\t" | awk '$5 != $8' > $Outfir/pairwiseblast.interhomo.tab
+
+grep ">" $Outfir/total.selected_pc.len.clstr.faa | cut -d "|" -f4 | sort | uniq | while read vc ; do cat $outpath/phage.list | grep -w "$vc" | grep "vig_" >> $Outfir/selected_pc.phage.list ; echo -e "done with $vc" ; done
 
 
 echo -e "job completed at $(date)"
