@@ -252,13 +252,21 @@ cat $workingdir/newtoadd.filtered.clustered.faa | tr "\n" "\t" | tr ">" "\n" | s
 
 cat $workingdir/selected_pc.len.clstr.faa $workingdir/newtoadd.filtered.clustered.formatted.faa > $Outfir/total.selected_pc.len.clstr.faa
 
+echo -e "start to remove inter-homo PCs at $(date)"
+
 $DIAMOND makedb -d $Outfir/total.selected_pc.len.clstr --in $Outfir/total.selected_pc.len.clstr.faa
 
 $DIAMOND blastx -d $Outfir/total.selected_pc.len.clstr -q $GPDdir/GPD_sequences.fa -f 6 -o $Outfir/pairwiseblast.tab --threads 2
 
-awk -F "\t" '$3 >= 75 && $4 >= 15 ' pairwiseblast.tab | cut -f1,2 | tr "|" "\t" | cut -f1,4,5 | sort | uniq | while read gm pc cl ; do echo -e "$gm\t$(grep -w "$gm" $outpath/phage.list)\t$pc\t$cl" ; done | awk -F "\t" '$2 != ""' | tr ":" "|" | tr "|" "\t" | awk '$5 != $8' > $Outfir/pairwiseblast.interhomo.tab
+cat $Outfir/pairwiseblast.tab |  awk -F "\t" '$3 >= 75 && $4 >= 15 ' | cut -f1,2 | tr "|" "\t" | cut -f1,4,5 | sort | uniq | while read gm pc cl ; do echo -e "$gm\t$(grep -w "$gm" $outpath/phage.list | tr ":" "|" | cut -d "|" -f4 | tr "\n" ":")\t$pc\t$cl"  ; done | awk -F "\t" '$2 != ""' | while read gm cl1 pc cl2 ; do if [[ "$cl1" != *"$cl2"* ]]; then echo -e "$pc"; fi ; done | sort | uniq > $Outfir/pairwiseblast.interhomo.tab
 
-grep ">" $Outfir/total.selected_pc.len.clstr.faa | cut -d "|" -f4 | sort | uniq | while read vc ; do cat $outpath/phage.list | grep -w "$vc" | grep "vig_" >> $Outfir/selected_pc.phage.list ; echo -e "done with $vc" ; done
+cat $Outfir/total.selected_pc.len.clstr.faa | grep ">" | tr "|" "\t" | cut -f3,4 | sort | uniq > $Outfir/preremoval.pcvc.list
+
+grep -v -w -f $Outfir/pairwiseblast.interhomo.tab $Outfir/preremoval.pcvc.list > $Outfir/final.pcvc.list
+
+cat $Outfir/final.pcvc.list  | while read pc vc ; do grep -w "$pc" -A1 $Outfir/total.selected_pc.len.clstr.faa ; done > $Outfir/final.selected_pc.len.clstr.faa
+
+grep ">" $Outfir/final.selected_pc.len.clstr.faa | cut -d "|" -f4 | sort | uniq | while read vc ; do cat $outpath/phage.list | grep -w "$vc" | grep "vig_" >> $Outfir/final.selected_pc.phage.list ; echo -e "done with $vc" ; done
 
 
 echo -e "job completed at $(date)"
