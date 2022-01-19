@@ -258,7 +258,7 @@ $DIAMOND makedb -d $Outfir/total.selected_pc.len.clstr --in $Outfir/total.select
 
 $DIAMOND blastx -d $Outfir/total.selected_pc.len.clstr -q $GPDdir/GPD_sequences.fa -f 6 -o $Outfir/pairwiseblast.tab --threads 2
 
-cat $Outfir/pairwiseblast.tab |  awk -F "\t" '$3 >= 75 && $4 >= 15 ' | cut -f1,2 | tr "|" "\t" | cut -f1,4,5 | sort | uniq | while read gm pc cl ; do echo -e "$gm\t$(grep -w "$gm" $outpath/phage.list | tr ":" "|" | cut -d "|" -f4 | tr "\n" ":")\t$pc\t$cl"  ; done | awk -F "\t" '$2 != ""' | while read gm cl1 pc cl2 ; do if [[ "$cl1" != *"$cl2"* ]]; then echo -e "$pc"; fi ; done | sort | uniq > $Outfir/pairwiseblast.interhomo.tab
+cat $Outfir/pairwiseblast.tab |  awk -F "\t" '$3 >= 75 && $4 >= 15 ' | cut -f1,2 | tr "|" "\t" | cut -f1,4,5 | sort | uniq | while read gm pc cl ; do echo -e "$gm\t$(grep -w "$gm" $outpath/phage.list | tr ":" "|" | cut -d "|" -f4 | tr "\n" ":")\t$pc\t$cl"  ; done | awk -F "\t" '$2 != ""' | while read gm cl1 pc cl2 ; do if [[ "$cl1" != *"$cl2:"* ]]; then echo -e "$pc"; fi ; done | sort | uniq > $Outfir/pairwiseblast.interhomo.tab
 
 cat $Outfir/total.selected_pc.len.clstr.faa | grep ">" | tr "|" "\t" | cut -f3,4 | sort | uniq > $Outfir/preremoval.pcvc.list
 
