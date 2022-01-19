@@ -245,7 +245,7 @@ cat $workingdir/moreselected.clustered.faa  | tr "\n" "\t" | tr ">" "\n" | sed '
 grep ">"  $workingdir/moreselected.clustered.len.faa | tr "|" "\t" | awk '$5 >= 15' | cut -f3,4 |  sort | uniq > $workingdir/newtoadd.pcvc.list
 
 
-cat $workingdir/newtoadd.pcvc.list |  while read pc vc ; do cat $outdir/$pc.$vc.aligned.faa-gb1.clustered.faa ; done > $workingdir/newtoadd.filtered.clustered.faa
+cat $workingdir/newtoadd.pcvc.list |  while read pc vc ; do grep -w "$pc" -A1 $workingdir/moreselected.clustered.len.faa ; done > $workingdir/newtoadd.filtered.clustered.faa
 
 
 cat $workingdir/newtoadd.filtered.clustered.faa | tr "\n" "\t" | tr ">" "\n" | sed '/^[[:space:]]*$/d' | while read line; do echo -e ">$(echo -e "$line" | cut -f1)\n$(echo -e "$line" | cut -f2- | sed -e "s/\t//g")" ; done | sed -e "s/ //g" > $workingdir/newtoadd.filtered.clustered.formatted.faa
@@ -268,5 +268,6 @@ cat $Outfir/final.pcvc.list  | while read pc vc ; do grep -w "$pc" -A1 $Outfir/t
 
 grep ">" $Outfir/final.selected_pc.len.clstr.faa | cut -d "|" -f4 | sort | uniq | while read vc ; do cat $outpath/phage.list | grep -w "$vc" | grep "vig_" >> $Outfir/final.selected_pc.phage.list ; echo -e "done with $vc" ; done
 
+grep ">" $Outfir/final.selected_pc.len.clstr.faa | sed -e "s/>//" | while read line ; do echo -e "$line\t$(echo -e "$line" | cut -d "|" -f5 | sed -e "s/aa//" )"; done > $Outfir/final.selected_pc.protlength.list
 
 echo -e "job completed at $(date)"
